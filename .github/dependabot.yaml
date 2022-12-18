@@ -1,0 +1,12 @@
+version: 2
+updates:
+  - package-ecosystem: "gitsubmodule"
+    directory: "/"
+    schedule:
+      interval: "daily"
+    assignees:
+      - "wxx9248"
+    commit-message:
+      prefix: "Submodule Updates"
+    reviewers:
+      - "wxx9248"

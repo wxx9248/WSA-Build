@@ -1,0 +1,17 @@
+12c12
+<     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.22000.120" MaxVersionTested="10.0.22000.120" />
+---
+>     <TargetDeviceFamily Name="Windows.Desktop" MinVersion="10.0.19044.2364" MaxVersionTested="10.0.22000.120" />
+184d183
+<     <rescap:Capability Name="customInstallActions" />
+191,200d189
+<     <desktop6:Extension Category="windows.customInstall">
+<       <desktop6:CustomInstall Folder="CustomInstall" desktop8:RunAsUser="true">
+<         <desktop6:RepairActions>
+<           <desktop6:RepairAction File="WsaSetup.exe" Name="Repair" Arguments="repair" />
+<         </desktop6:RepairActions>
+<         <desktop6:UninstallActions>
+<           <desktop6:UninstallAction File="WsaSetup.exe" Name="Uninstall" Arguments="uninstall" />
+<         </desktop6:UninstallActions>
+<       </desktop6:CustomInstall>
+<     </desktop6:Extension>
