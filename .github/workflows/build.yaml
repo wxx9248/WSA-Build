@@ -1,0 +1,217 @@
+name: Build
+
+on:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: "CPU architecture"
+        required: true
+        default: x64
+        type: choice
+        options:
+          - x64
+          - arm64
+
+      release_type:
+        description: "WSA release type"
+        required: true
+        default: RP
+        type: choice
+        options:
+          - retail
+          - RP
+          - WIS
+          - WIF
+
+      magisk_version:
+        description: "Magisk channel"
+        required: true
+        default: stable
+        type: choice
+        options:
+          - stable
+          - beta
+          - canary
+          - debug
+
+      google_apps_brand:
+        description: "Google apps distribution"
+        required: true
+        default: MindTheGapps
+        type: choice
+        options:
+          - none
+          - MindTheGapps
+          - OpenGApps
+
+      google_apps_variant:
+        description: "Google apps variant"
+        required: true
+        default: pico
+        type: choice
+        options:
+          - pico
+
+      remove_amazon:
+        description: "Remove Amazon Store"
+        required: true
+        default: false
+        type: boolean
+
+      root_solution:
+        description: "Root solution"
+        required: true
+        default: magisk
+        type: choice
+        options:
+          - magisk
+          - none
+
+env:
+  WSA_BUILD_ARCHITECTURE: ${{ inputs.architecture }}
+  WSA_BUILD_RELEASE_TYPE: ${{ inputs.release_type }}
+  WSA_BUILD_MAGISK_VERSION: ${{ inputs.magisk_version }}
+  WSA_BUILD_GOOGLE_APPS_BRAND: ${{ inputs.google_apps_brand }}
+  WSA_BUILD_GOOGLE_APPS_VARIANT: ${{ inputs.google_apps_variant }}
+  WSA_BUILD_REMOVE_AMAZON: ${{ inputs.remove_amazon }}
+  WSA_BUILD_ROOT_SOLUTION: ${{ inputs.root_solution }}
+
+jobs:
+  build-magisk-on-wsa:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      # - name: Open reverse SSH
+      #   run: bash ./github_actions_reverse_ssh.sh
+
+      - name: Updating package manager cache
+        run: sudo apt update -y
+
+      - name: Upgrading system
+        run: sudo apt upgrade -y
+
+      - name: Installing dependencies
+        run: sudo bash ./install_requirements.sh
+
+      - name: Patching Magisk on WSA building script
+        run: |
+          echo Some rants for this
+          echo
+          echo 'This little $h!tty patch just took my whole day...'
+          echo "I really don't know why the random string generator won't work???"
+          echo 'It works perfectly well *anywhere* except here!! It even works in an ncat reverse shell!'
+          echo 'But it just stuck in an infinite loop if you try to run it directly in GitHub Actions environment...'
+          echo 'Who the hell knows something so small could go wrong in this *specific* environment???'
+          sleep 5
+          patch MagiskOnWSALocal/scripts/build.sh fix_random_string_generator.patch
+
+      - name: Building Magisk on WSA
+        run: bash ./build_wsa.sh
+
+      - name: Archiving and compressing artifact
+        run: |
+          cd MagiskOnWSALocal/output
+          tar -I "xz -T$(nproc) -9" -cvf ../MagiskOnWSA.tar.xz .
+          cd ../..
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: MagiskOnWSA.tar.xz
+          path: MagiskOnWSALocal/MagiskOnWSA.tar.xz
+
+  build-wsa-patch:
+    runs-on: windows-latest
+    steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Setup CMake
+        uses: jwlawson/actions-setup-cmake@v1.13
+
+      - name: Setup MSBuild
+        uses: microsoft/setup-msbuild@v1.1
+
+      - name: Generate MSBuild project with CMake
+        run: |
+          cd .\WSAPatch\
+          cmake .
+          cd ..
+
+      - name: Build project with MSBuild
+        run: |
+          cd .\WSAPatch\
+          msbuild .\WsaPatch.sln /property:Configuration=Release
+          cd ..
+
+      - name: Archiving and compressing artifact
+        run: |
+          copy .\WSAPatch\Release\WsaPatch.dll
+          copy .\WSAPatch\original.dll.win11.22h2\x86_64\icu.dll
+          copy .\WSAPatch\original.dll.win11.22h2\x86_64\winhttp.dll
+          tar -czvf .\WSAPatch.tar.gz *.dll
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: WSAPatch.tar.gz
+          path: WSAPatch.tar.gz
+
+  build-magisk-on-wsa-10:
+    needs:
+      - build-wsa-patch
+      - build-magisk-on-wsa
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checks-out repository
+        uses: actions/checkout@v3
+        with:
+          submodules: recursive
+
+      - name: Download artifacts
+        uses: actions/download-artifact@v3
+        with:
+          path: artifacts/
+
+      - name: Extracing files
+        run: |
+          cd artifacts
+
+          for name in *;
+          do
+              mv $name/$name ../$name;
+              rmdir $name
+              mv ../$name ./
+          done;
+
+          tar -xzvf WSAPatch.tar.gz
+          rm WSAPatch.tar.gz
+          tar -xJvf MagiskOnWSA.tar.xz
+          rm MagiskOnWSA.tar.xz
+
+          cd ..
+
+      - name: Applying patch for Windows 10
+        run: |
+          cd artifacts
+          mv *.dll */WsaClient/
+          patch --binary */AppxManifest.xml ../wsa_windows_10.patch
+          cd ..
+
+      - name: Archiving and compressing artifact
+        run: |
+          cd artifacts
+          tar -I "xz -T$(nproc) -9" -cvf ../MagiskOnWSA10.tar.xz .
+          cd ..
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: MagiskOnWSA10.tar.xz
+          path: MagiskOnWSA10.tar.xz

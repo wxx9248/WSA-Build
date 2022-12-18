@@ -1,0 +1,6 @@
+[submodule "MagiskOnWSALocal"]
+	path = MagiskOnWSALocal
+	url = https://github.com/LSPosed/MagiskOnWSALocal
+[submodule "WSAPatch"]
+	path = WSAPatch
+	url = https://github.com/cinit/WSAPatch
