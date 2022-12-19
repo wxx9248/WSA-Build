@@ -163,7 +163,7 @@ jobs:
           name: WSAPatch.tar.gz
           path: WSAPatch.tar.gz
 
-  build-wsa-on-wsa-10:
+  build-magisk-on-wsa-10:
     needs:
       - build-wsa-patch
       - build-magisk-on-wsa
