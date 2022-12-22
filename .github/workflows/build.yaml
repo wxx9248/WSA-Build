@@ -125,43 +125,38 @@ jobs:
           path: MagiskOnWSALocal/MagiskOnWSA.tar.xz
 
   build-wsa-patch:
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     steps:
       - name: Checks-out repository
         uses: actions/checkout@v3
         with:
           submodules: recursive
 
-      - name: Setup CMake
-        uses: jwlawson/actions-setup-cmake@v1.13
+      - name: Updating package manager cache
+        run: sudo apt update -y
 
-      - name: Setup MSBuild
-        uses: microsoft/setup-msbuild@v1.1
+      - name: Upgrading system
+        run: sudo apt upgrade -y
 
-      - name: Generate MSBuild project with CMake
+      - name: Installing dependencies
+        run: sudo apt install p7zip
+
+      - name: Downloading and extracing WSAPatch release files
         run: |
-          cd .\WSAPatch\
-          cmake .
-          cd ..
-
-      - name: Build project with MSBuild
-        run: |
-          cd .\WSAPatch\
-          msbuild .\WsaPatch.sln /property:Configuration=Release
+          cd WSAPatch
+          bash download.sh file_list.csv
+          7z e release.7z
           cd ..
 
       - name: Archiving and compressing artifact
         run: |
-          copy .\WSAPatch\Release\WsaPatch.dll
-          copy .\WSAPatch\original.dll.win11.22h2\x86_64\icu.dll
-          copy .\WSAPatch\original.dll.win11.22h2\x86_64\winhttp.dll
-          tar -czvf .\WSAPatch.tar.gz *.dll
+          tar -I "xz -T$(nproc) -9" -cvf WSAPatch.tar.xz *.dll
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
         with:
-          name: WSAPatch.tar.gz
-          path: WSAPatch.tar.gz
+          name: WSAPatch.tar.xz
+          path: WSAPatch.tar.xz
 
   build-magisk-on-wsa-10:
     needs:
@@ -190,8 +185,8 @@ jobs:
               mv ../$name ./
           done;
 
-          tar -xzvf WSAPatch.tar.gz
-          rm WSAPatch.tar.gz
+          tar -xJvf WSAPatch.tar.xz
+          rm WSAPatch.tar.xz
           tar -xJvf MagiskOnWSA.tar.xz
           rm MagiskOnWSA.tar.xz
 
