@@ -150,7 +150,9 @@ jobs:
 
       - name: Archiving and compressing artifact
         run: |
-          tar -I "xz -T$(nproc) -9" -cvf WSAPatch.tar.xz *.dll
+          cd WSAPatch
+          tar -I "xz -T$(nproc) -9" -cvf ../WSAPatch.tar.xz *.dll
+          cd ..
 
       - name: Upload artifact
         uses: actions/upload-artifact@v3
