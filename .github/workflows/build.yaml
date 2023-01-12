@@ -99,15 +99,7 @@ jobs:
 
       - name: Patching Magisk on WSA building script
         run: |
-          echo Some rants for this
-          echo
-          echo 'This little $h!tty patch just took my whole day...'
-          echo "I really don't know why the random string generator won't work???"
-          echo 'It works perfectly well *anywhere* except here!! It even works in an ncat reverse shell!'
-          echo 'But it just stuck in an infinite loop if you try to run it directly in GitHub Actions environment...'
-          echo 'Who the hell knows something so small could go wrong in this *specific* environment???'
-          sleep 5
-          patch MagiskOnWSALocal/scripts/build.sh fix_random_string_generator.patch
+          echo "Yay, the upstream devs have fixed this :)"
 
       - name: Building Magisk on WSA
         run: bash ./build_wsa.sh
