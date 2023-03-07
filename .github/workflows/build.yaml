@@ -91,9 +91,6 @@ jobs:
       - name: Updating package manager cache
         run: sudo apt update -y
 
-      - name: Upgrading system
-        run: sudo apt upgrade -y
-
       - name: Installing dependencies
         run: sudo bash ./install_requirements.sh
 
@@ -126,9 +123,6 @@ jobs:
 
       - name: Updating package manager cache
         run: sudo apt update -y
-
-      - name: Upgrading system
-        run: sudo apt upgrade -y
 
       - name: Installing dependencies
         run: sudo apt install p7zip
