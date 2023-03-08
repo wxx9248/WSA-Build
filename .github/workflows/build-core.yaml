@@ -4,53 +4,33 @@ on:
   workflow_call:
     inputs:
       architecture:
-        description: "CPU architecture"
         required: true
         default: x64
-        type: choice
-        options:
-          - x64
-          - arm64
+        type: string
 
       release_type:
         description: "WSA release type"
         required: true
         default: RP
-        type: choice
-        options:
-          - retail
-          - RP
-          - WIS
-          - WIF
+        type: string
 
       magisk_version:
         description: "Magisk channel"
         required: true
         default: stable
-        type: choice
-        options:
-          - stable
-          - beta
-          - canary
-          - debug
+        type: string
 
       google_apps_brand:
         description: "Google apps distribution"
         required: true
         default: MindTheGapps
-        type: choice
-        options:
-          - none
-          - MindTheGapps
-          - OpenGApps
+        type: string
 
       google_apps_variant:
         description: "Google apps variant"
         required: true
         default: pico
-        type: choice
-        options:
-          - pico
+        type: string
 
       remove_amazon:
         description: "Remove Amazon Store"
@@ -62,10 +42,7 @@ on:
         description: "Root solution"
         required: true
         default: magisk
-        type: choice
-        options:
-          - magisk
-          - none
+        type: string
 
 env:
   WSA_BUILD_ARCHITECTURE: ${{ inputs.architecture }}
