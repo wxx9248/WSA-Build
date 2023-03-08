@@ -1,0 +1,73 @@
+name: Build - Manual
+
+on:
+  workflow_dispatch:
+    inputs:
+      architecture:
+        description: "CPU architecture"
+        required: true
+        default: x64
+        type: choice
+        options:
+          - x64
+          - arm64
+
+      release_type:
+        description: "WSA release type"
+        required: true
+        default: RP
+        type: choice
+        options:
+          - retail
+          - RP
+          - WIS
+          - WIF
+
+      magisk_version:
+        description: "Magisk channel"
+        required: true
+        default: stable
+        type: choice
+        options:
+          - stable
+          - beta
+          - canary
+          - debug
+
+      google_apps_brand:
+        description: "Google apps distribution"
+        required: true
+        default: MindTheGapps
+        type: choice
+        options:
+          - none
+          - MindTheGapps
+          - OpenGApps
+
+      google_apps_variant:
+        description: "Google apps variant"
+        required: true
+        default: pico
+        type: choice
+        options:
+          - pico
+
+      remove_amazon:
+        description: "Remove Amazon Store"
+        required: true
+        default: false
+        type: boolean
+
+      root_solution:
+        description: "Root solution"
+        required: true
+        default: magisk
+        type: choice
+        options:
+          - magisk
+          - none
+
+jobs:
+  build-manual:
+    uses: ./.github/workflows/build-core.yaml
+    with: ${{ inputs }}
