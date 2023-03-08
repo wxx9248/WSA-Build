@@ -4,43 +4,43 @@ on:
   workflow_call:
     inputs:
       architecture:
-        required: true
+        required: false
         default: x64
         type: string
 
       release_type:
         description: "WSA release type"
-        required: true
+        required: false
         default: RP
         type: string
 
       magisk_version:
         description: "Magisk channel"
-        required: true
+        required: false
         default: stable
         type: string
 
       google_apps_brand:
         description: "Google apps distribution"
-        required: true
+        required: false
         default: MindTheGapps
         type: string
 
       google_apps_variant:
         description: "Google apps variant"
-        required: true
+        required: false
         default: pico
         type: string
 
       remove_amazon:
         description: "Remove Amazon Store"
-        required: true
+        required: false
         default: false
         type: boolean
 
       root_solution:
         description: "Root solution"
-        required: true
+        required: false
         default: magisk
         type: string
 
