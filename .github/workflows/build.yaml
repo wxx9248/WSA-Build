@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
     inputs:
       architecture:
-        description: "CPU architecture"
+        description: "Target CPU architecture"
         required: true
         default: x64
         type: choice
@@ -19,9 +19,9 @@ on:
         type: choice
         options:
           - retail
-          - RP
-          - WIS
-          - WIF
+          - release preview
+          - insider slow
+          - insider fast
 
       magisk_version:
         description: "Magisk channel"
@@ -35,7 +35,7 @@ on:
           - debug
 
       google_apps_brand:
-        description: "Google apps distribution"
+        description: "Google apps brand"
         required: true
         default: MindTheGapps
         type: choice
@@ -65,6 +65,7 @@ on:
         type: choice
         options:
           - magisk
+          - kernelsu
           - none
 
   workflow_call:
@@ -76,7 +77,7 @@ on:
 
       release_type:
         required: false
-        default: RP
+        default: release preview
         type: string
 
       magisk_version:
@@ -130,10 +131,6 @@ jobs:
 
       - name: Installing dependencies
         run: sudo bash ./install_requirements.sh
-
-      - name: Patching Magisk on WSA building script
-        run: |
-          echo "Yay, the upstream devs have fixed this :)"
 
       - name: Building Magisk on WSA
         run: bash ./build_wsa.sh
