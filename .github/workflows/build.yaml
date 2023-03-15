@@ -130,10 +130,10 @@ jobs:
         run: sudo apt update -y
 
       - name: Installing dependencies
-        run: sudo bash ./install_requirements.sh
+        run: sudo bash -e -x ./install_requirements.sh
 
       - name: Building Magisk on WSA
-        run: bash ./build_wsa.sh
+        run: bash -e -x ./build_wsa.sh
 
       - name: Archiving and compressing artifact
         run: |
@@ -164,7 +164,7 @@ jobs:
       - name: Downloading and extracing WSAPatch release files
         run: |
           cd WSAPatch
-          bash download.sh file_list.csv
+          bash -e -x download.sh file_list.csv
           7z e release.7z
           cd ..
 

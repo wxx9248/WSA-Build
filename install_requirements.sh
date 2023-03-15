@@ -1,5 +1,5 @@
 #!/bin/bash
 
 cd MagiskOnWSALocal/scripts
-bash -x ./install_deps.sh
+bash -e -x ./install_deps.sh
 cd ../..
