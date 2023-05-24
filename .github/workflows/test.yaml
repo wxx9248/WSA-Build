@@ -1,0 +1,22 @@
+name: Test
+
+on:
+  workflow_dispatch:
+    inputs:
+      reverse-ssh-public-key:
+        description: "SSH public key"
+        required: true
+        type: string
+
+      reverse-ssh-remote-address-port:
+        description: "Remote address and port"
+        required: true
+        type: string
+
+jobs:
+  test:
+    uses: ./.github/workflows/build.yaml
+    with:
+      reverse-ssh: true
+      reverse-ssh-public-key: ${{ inputs.reverse-ssh-public-key }}
+      reverse-ssh-remote-address-port: ${{ inputs.reverse-ssh-remote-address-port }}
