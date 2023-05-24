@@ -1,0 +1,15 @@
+86,94c86
+<     for f in "${!os_pm_install[@]}"; do
+<         if [[ -f $f ]]; then
+<             PM="${os_pm_install[$f]}"
+<             break
+<         fi
+<     done
+<     if [[ "$osrel" = *"suse"* ]]; then
+<         PM="zypper"
+<     fi
+---
+>     PM="pacman"
+110,111d101
+< else
+<     if ! ($SUDO "$PM" "${UPDATE_OPTION[@]}" && $SUDO "$PM" "${UPGRADE_OPTION[@]}" ca-certificates); then abort; fi

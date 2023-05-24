@@ -1,5 +1,7 @@
 #!/bin/bash
 
+set -e
+
 declare -A RELEASE_TYPE_MAP=(
     ["retail"]="retail"
     ["release preview"]="RP"
