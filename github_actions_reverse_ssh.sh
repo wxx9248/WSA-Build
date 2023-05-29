@@ -5,7 +5,7 @@ if [[ "$REVERSE_SSH" != "true" ]]; then
     exit 0
 fi
 
-apt-get install socat
+apt-get install -y socat
 mkdir -p ~/.ssh
 chmod 700 ~/.ssh
 echo "$REVERSE_SSH_PUBLIC_KEY" >~/.ssh/authorized_keys
