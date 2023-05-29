@@ -15,7 +15,7 @@ on:
       release_type:
         description: "WSA release type"
         required: true
-        default: RP
+        default: retail
         type: choice
         options:
           - retail
