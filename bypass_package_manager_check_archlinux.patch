@@ -1,4 +1,4 @@
-86,94c86
+84,100c84
 <     for f in "${!os_pm_install[@]}"; do
 <         if [[ -f $f ]]; then
 <             PM="${os_pm_install[$f]}"
@@ -8,8 +8,32 @@
 <     if [[ "$osrel" = *"suse"* ]]; then
 <         PM="zypper"
 <     fi
+<     if [ -n "$PM" ]; then
+<         readarray -td ' ' UPDATE_OPTION <<<"${PM_UPDATE_MAP[$PM]} "
+<         unset 'UPDATE_OPTION[-1]'
+<         readarray -td ' ' INSTALL_OPTION <<<"${PM_INSTALL_MAP[$PM]} "
+<         unset 'INSTALL_OPTION[-1]'
+<         readarray -td ' ' UPGRADE_OPTION <<<"${PM_UPGRADE_MAP[$PM]} "
+<         unset 'UPGRADE_OPTION[-1]'
+<     fi
 ---
->     PM="pacman"
-110,111d101
+>      PM="pacman"
+108,125d91
+< elif [ "$PM" = "pacman" ]; then
+<     i=30
+<     while ((i-- > 1)) &&
+<         ! read -r -sn 1 -t 1 -p $'\r:: Proceed with full system upgrade? Cancel after '$i$'s.. [y/N]\e[0K ' answer; do
+<         :
+<     done
+<     [[ $answer == [yY] ]] && answer=Yes || answer=No
+<     echo "$answer"
+<     case "$answer" in
+<     Yes)
+<         if ! (sudo "$PM" "${UPDATE_OPTION[@]}" ca-certificates); then abort; fi
+<         ;;
+<     *)
+<         abort "Operation cancelled by user"
+<         ;;
+<     esac
 < else
-<     if ! ($SUDO "$PM" "${UPDATE_OPTION[@]}" && $SUDO "$PM" "${UPGRADE_OPTION[@]}" ca-certificates); then abort; fi
+<     if ! (sudo "$PM" "${UPDATE_OPTION[@]}" && sudo "$PM" "${UPGRADE_OPTION[@]}" ca-certificates); then abort; fi
