@@ -4,9 +4,5 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
-    assignees:
-      - "wxx9248"
     commit-message:
       prefix: "Submodule Updates"
-    reviewers:
-      - "wxx9248"
