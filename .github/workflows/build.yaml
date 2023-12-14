@@ -154,7 +154,7 @@ jobs:
           cd ../..
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MagiskOnWSA.tar.xz
           path: MagiskOnWSALocal/MagiskOnWSA.tar.xz
@@ -187,7 +187,7 @@ jobs:
           cd ..
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: WSAPatch.tar.xz
           path: WSAPatch.tar.xz
@@ -240,7 +240,7 @@ jobs:
           cd ..
 
       - name: Upload artifact
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: MagiskOnWSA10.tar.xz
           path: MagiskOnWSA10.tar.xz
