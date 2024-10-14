@@ -58,7 +58,7 @@ on:
         type: string
       release_type:
         required: false
-        default: insider fast
+        default: Insider Fast
         type: string
       magisk_version:
         required: false
