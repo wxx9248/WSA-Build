@@ -1,5 +1,4 @@
 name: Build
-
 on:
   workflow_dispatch:
     inputs:
@@ -11,18 +10,16 @@ on:
         options:
           - x64
           - arm64
-
       release_type:
         description: "WSA release type"
         required: true
         default: retail
         type: choice
         options:
-          - retail
-          - release preview
-          - insider slow
-          - insider fast
-
+          - Retail
+          - Release Preview
+          - Insider Slow
+          - Insider Fast
       magisk_version:
         description: "Magisk channel"
         required: true
@@ -33,30 +30,17 @@ on:
           - beta
           - canary
           - debug
-
-      google_apps_brand:
-        description: "Google apps brand"
+          - release
+      install_gapps:
+        description: "Install GApps"
         required: true
-        default: MindTheGapps
-        type: choice
-        options:
-          - none
-          - MindTheGapps
-
-      google_apps_variant:
-        description: "Google apps variant"
-        required: true
-        default: pico
-        type: choice
-        options:
-          - pico
-
+        default: true
+        type: boolean
       remove_amazon:
         description: "Remove Amazon Store"
         required: true
         default: false
         type: boolean
-
       root_solution:
         description: "Root solution"
         required: true
@@ -66,57 +50,42 @@ on:
           - magisk
           - kernelsu
           - none
-
   workflow_call:
     inputs:
       architecture:
         required: false
         default: x64
         type: string
-
       release_type:
         required: false
-        default: insider fast
+        default: Insider Fast
         type: string
-
       magisk_version:
         required: false
         default: stable
         type: string
-
-      google_apps_brand:
+      install_gapps:
         required: false
-        default: MindTheGapps
-        type: string
-
-      google_apps_variant:
-        required: false
-        default: pico
-        type: string
-
+        default: true
+        type: boolean
       remove_amazon:
         required: false
         default: false
         type: boolean
-
       root_solution:
         required: false
         default: magisk
         type: string
-
       reverse-ssh:
         required: false
         default: false
         type: string
-
       reverse-ssh-public-key:
         required: false
         type: string
-
       reverse-ssh-remote-address-port:
         required: false
         type: string
-
 env:
   REVERSE_SSH: ${{ inputs.reverse-ssh }}
   REVERSE_SSH_PUBLIC_KEY: ${{ inputs.reverse-ssh-public-key }}
@@ -124,11 +93,9 @@ env:
   WSA_BUILD_ARCHITECTURE: ${{ inputs.architecture }}
   WSA_BUILD_RELEASE_TYPE: ${{ inputs.release_type }}
   WSA_BUILD_MAGISK_VERSION: ${{ inputs.magisk_version }}
-  WSA_BUILD_GOOGLE_APPS_BRAND: ${{ inputs.google_apps_brand }}
-  WSA_BUILD_GOOGLE_APPS_VARIANT: ${{ inputs.google_apps_variant }}
+  WSA_BUILD_INSTALL_GAPPS: ${{ inputs.install_gapps }}
   WSA_BUILD_REMOVE_AMAZON: ${{ inputs.remove_amazon }}
   WSA_BUILD_ROOT_SOLUTION: ${{ inputs.root_solution }}
-
 jobs:
   build-magisk-on-wsa:
     runs-on: ubuntu-latest
@@ -137,28 +104,22 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-
       - name: Open reverse SSH if in test mode
-        run: bash -e ./github_actions_reverse_ssh.sh
-
+        run: ./github_actions_reverse_ssh.sh
       - name: Installing dependencies for building Magisk on WSA
-        run: bash -e -x ./install_dependencies.sh
-
+        run: ./install_dependencies.sh
       - name: Building Magisk on WSA
-        run: bash -e -x ./build_wsa.sh
-
+        run: ./build_wsa.sh
       - name: Archiving and compressing artifact
         run: |
           cd MagiskOnWSALocal/output
-          tar -I "xz -T$(nproc) -9" -cvf ../MagiskOnWSA.tar.xz .
+          tar -cvf ../MagiskOnWSA.tar .
           cd ../..
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MagiskOnWSA.tar.xz
-          path: MagiskOnWSALocal/MagiskOnWSA.tar.xz
-
+          name: MagiskOnWSA.tar
+          path: MagiskOnWSALocal/MagiskOnWSA.tar
   build-wsa-patch:
     runs-on: ubuntu-latest
     steps:
@@ -166,32 +127,26 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-
       - name: Updating package manager cache
         run: sudo apt update -y
-
       - name: Installing dependencies
         run: sudo apt install p7zip
-
       - name: Downloading and extracing WSAPatch release files
         run: |
           cd WSAPatch
           bash -e -x download.sh file_list.csv
           7z e release.7z
           cd ..
-
       - name: Archiving and compressing artifact
         run: |
           cd WSAPatch
-          tar -I "xz -T$(nproc) -9" -cvf ../WSAPatch.tar.xz *.dll
+          tar -cvf ../WSAPatch.tar *.dll
           cd ..
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: WSAPatch.tar.xz
-          path: WSAPatch.tar.xz
-
+          name: WSAPatch.tar
+          path: WSAPatch.tar
   build-magisk-on-wsa-10:
     needs:
       - build-wsa-patch
@@ -202,45 +157,40 @@ jobs:
         uses: actions/checkout@v4
         with:
           submodules: recursive
-
       - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           path: artifacts/
-
       - name: Extracing files
         run: |
           cd artifacts
 
-          for name in *;
+          for name in *
           do
-              mv $name/$name ../$name;
+              mv $name/$name ../$name
               rmdir $name
               mv ../$name ./
-          done;
+          done
 
-          tar -xJvf WSAPatch.tar.xz
-          rm WSAPatch.tar.xz
-          tar -xJvf MagiskOnWSA.tar.xz
-          rm MagiskOnWSA.tar.xz
+          tar -xvf WSAPatch.tar
+          rm WSAPatch.tar
+          tar -xvf MagiskOnWSA.tar
+          rm MagiskOnWSA.tar
 
           cd ..
-
       - name: Applying patch for Windows 10
         run: |
           cd artifacts
           mv *.dll */WsaClient/
           patch --binary */AppxManifest.xml ../wsa_windows_10.patch
           cd ..
-
       - name: Archiving and compressing artifact
         run: |
           cd artifacts
-          tar -I "xz -T$(nproc) -9" -cvf ../MagiskOnWSA10.tar.xz .
+          tar -cvf ../MagiskOnWSA10.tar .
           cd ..
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: MagiskOnWSA10.tar.xz
-          path: MagiskOnWSA10.tar.xz
+          name: MagiskOnWSA10.tar
+          path: MagiskOnWSA10.tar
