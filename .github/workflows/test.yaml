@@ -1,5 +1,4 @@
 name: Test
-
 on:
   workflow_dispatch:
     inputs:
@@ -7,12 +6,10 @@ on:
         description: "SSH public key"
         required: true
         type: string
-
       reverse-ssh-remote-address-port:
         description: "Remote address and port"
         required: true
         type: string
-
 jobs:
   test:
     uses: ./.github/workflows/build.yaml

@@ -1,10 +1,8 @@
 name: Pull Request Check
-
 on:
   pull_request:
     branches:
       - '**'
-
 jobs:
   pull-request-check:
     uses: ./.github/workflows/build.yaml
